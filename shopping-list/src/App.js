@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import List from './List'
 import './App.css';
+import STORE from './STORE'; // remove this later
 
-
+// testing git -m 'mike was here'
 class App extends Component {
   
   constructor(props) {
