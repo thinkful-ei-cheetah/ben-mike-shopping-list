@@ -52,12 +52,26 @@ class App extends Component {
 
   //TODO: change list reference from List
   handleDeleteCard = (item) => {
-    this.setState ({
-      omit(list, item) 
+    console.log('handleDeleteCard')
+       
+    const { lists, allCards } = this.state.store;
+    const newLists = lists.map(list => {
+      list.cardIds = list.cardIds.filter(id => id !== item);
+      return list;
+    });
+
+    delete allCards[item];
+
+    this.setState({
+      store: {
+        lists: newLists,
+        allCards
+      }
     })
   }
 
   omit(obj, keyToOmit) {
+    
     return Object.entries(obj).reduce(
       (newObj, [key, value]) =>
         key === keyToOmit ? newObj : { ...newObj, [key]: value },
@@ -66,14 +80,24 @@ class App extends Component {
   }
 
   handleAddRandomCard = (id) => {
-    const newCard = this.newRandomCard()
-    console.log(newCard)
     console.log(id)
-    console.log(this.state.store.lists[id])
+    
+    const newCard = this.newRandomCard()
+    const updateCardId = this.state.store.lists.map(
+        list => {
+          if (list.id === String(id)) {
+            list.cardIds.push(newCard.id)
+          }
+          return list
+        }
+      )
+    
     this.setState ({
-      // store: this.state.store.lists.map(
-      //   list => list.id === id ? {...list, cardIds: this.cardIds.push(newCard)} : list
-      // )
+      store: {
+        lists: updateCardId,
+        allCards: {...this.state.store.allCards, [newCard.id]: newCard},
+      }
+      
     });
   }
 
@@ -98,9 +122,10 @@ class App extends Component {
           {this.state.store.lists.map(list => (
             <List
               key={list.id}
+              list={list.id}
               header={list.header}
               cards={list.cardIds.map(id => this.state.store.allCards[id])}
-              onDeleteCard={() => this.handleDeleteCard()}
+              onDeleteCard={(item) => this.handleDeleteCard(item)}
               onAddRandomCard={id => this.handleAddRandomCard(id)}
             />
           ))}
